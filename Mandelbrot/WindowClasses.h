@@ -1,5 +1,10 @@
 #pragma once
+#pragma comment(lib, "d2d1")
 #include <windows.h>
+#include <d2d1.h>
+#include <d2d1helper.h>
+#include <d2d1effects.h>
+
 
 template <class DERIVED> 
 class Control // base window class
@@ -231,6 +236,23 @@ protected:
 
 class Form : public Control<Form> 
 {
-	
+public: 
+	LRESULT MessageHandler(HWND hWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override //overridden MessageHandler to define custom behaviour
+	{
+		return Form::MessageHandler(hWND, uMsg, wParam, lParam); // calls base class Message handler
+	}
+};
 
+class Canvas : public Control<Canvas>
+{
+private: 
+	DWORD Styles = WS_HSCROLL || WS_CHILD || CS_OWNDC;
+	DWORD ExStyles = WS_EX_RIGHTSCROLLBAR;
+	ID2D1Factory* pFactory;
+	ID2D1HwndRenderTarget* pRT;
+protected:
+	static BOOL InitDirect2D(HWND hWnd, ID2D1Factory* pD2DFactory, ID2D1HwndRenderTarget* pRT);
+public:
+	LRESULT MessageHandler(HWND hWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+	virtual HRESULT Draw();
 };
